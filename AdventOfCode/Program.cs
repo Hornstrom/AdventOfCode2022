@@ -6,6 +6,7 @@ using AdventOfCode.Day3;
 using AdventOfCode.Day4;
 using AdventOfCode.Day5;
 using AdventOfCode.Day6;
+using AdventOfCode.Day7;
 
 Console.WriteLine("Advent of Code 2022!" + Environment.NewLine);
 
@@ -34,7 +35,12 @@ Console.WriteLine("Advent of Code 2022!" + Environment.NewLine);
 // day5.Part1();
 // day5.Part2();
 
-Console.WriteLine("--- Day 6: Tuning Trouble ---");
-var day6 = new Day6();
-day6.Part1();
-day6.Part2();
+// Console.WriteLine("--- Day 6: Tuning Trouble ---");
+// var day6 = new Day6();
+// day6.Part1();
+// day6.Part2();
+
+Console.WriteLine("");
+var day7 = new Day7();
+day7.Part1();
+day7.Part2();
