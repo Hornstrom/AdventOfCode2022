@@ -1,18 +1,26 @@
-﻿using System.Text.RegularExpressions;
-
-namespace AdventOfCode.Day9;
+﻿using System;
+using System.Text.RegularExpressions;
 
 public class RopeBridge
 {
+    private bool _shouldPrint;
+    private int _startPosX;
+    private int _startPosY;
+    
     private Location[,] _locations;
     private int _headPosX;
     private int _headPosY;
     private int _tailPosX;
     private int _tailPosY;
-    private int _gridSize = 2000;
+    private int _gridSize;
 
-    public RopeBridge()
+    public RopeBridge(int gridSize, int startPosX, int startPosY, bool shouldPrint)
     {
+        _shouldPrint = shouldPrint;
+        _gridSize = gridSize;
+        _startPosX = startPosX;
+        _startPosY = startPosY;
+        
         _locations = new Location[_gridSize, _gridSize];
 
         for (int i = 0; i < _gridSize; i++)
@@ -26,27 +34,24 @@ public class RopeBridge
 
     public void RunCommands(string[] data)
     {
-        var x = 1000;
-        var y = 1000;
+        _locations[_startPosX, _startPosY].IsStartingLocation = true;
+        _locations[_startPosX, _startPosY].ContainsHead = true;
+        _locations[_startPosX, _startPosY].ContainsTail = true;
+        _locations[_startPosX, _startPosY].HasBeenVisitedByTail = true;
 
-        _locations[x, y].IsStartingLocation = true;
-        _locations[x, y].ContainsHead = true;
-        _locations[x, y].ContainsTail = true;
-        _locations[x, y].HasBeenVisitedByTail = true;
+        _headPosX = _startPosX;
+        _headPosY = _startPosY;
+        _tailPosX = _startPosX;
+        _tailPosY = _startPosY;
 
-        _headPosX = x;
-        _headPosY = y;
-        _tailPosX = x;
-        _tailPosY = y;
-
-        // Print();
+        Print();
         
         foreach (var line in data)
         {
-            Console.WriteLine($"== {line} ==");
+            Console.WriteLine($"{line}");
             var direction = line[0];
 
-            var regex = new Regex("\\d");
+            var regex = new Regex("\\d+");
             var moves = int.Parse(regex.Match(line).Value);
 
             switch (direction)
@@ -86,6 +91,11 @@ public class RopeBridge
 
     public void Print()
     {
+        if (!_shouldPrint)
+        {
+            return;
+        }
+        Console.WriteLine();
         for (int i = 0; i < _gridSize; i++)
         {
             for (int j = 0; j < _gridSize; j++)
@@ -123,30 +133,16 @@ public class RopeBridge
             _locations[_headPosX, _headPosY].ContainsHead = true;
 
             _locations[_tailPosX, _tailPosY].ContainsTail = false;
-            // trigger diagonal move to heads previous space
-            if (Math.Abs(_headPosX - _tailPosX) + Math.Abs(_headPosY - _tailPosY) > 2)
+            
+            if (Math.Abs(_headPosX - _tailPosX) > 1 || Math.Abs(_headPosY - _tailPosY) > 1)
             {
                 _tailPosX = _headPosX - xDirection;
                 _tailPosY = _headPosY - yDirection;
             }
-            else // tail simply follows
-            {
-                if (Math.Abs(_headPosX - _tailPosX) > 1)
-                {
-                    _tailPosX = _headPosX - xDirection;
-                    _tailPosY = _headPosY - yDirection;
-                }
             
-                if (Math.Abs(_headPosY - _tailPosY) > 1)
-                {
-                    _tailPosX = _headPosX - xDirection;
-                    _tailPosY = _headPosY - yDirection;
-                }    
-            }
             _locations[_tailPosX, _tailPosY].ContainsTail = true;
             _locations[_tailPosX, _tailPosY].HasBeenVisitedByTail = true;
-            // Print();
-            // Console.WriteLine();
+            Print();
         }
     }
 }

@@ -1,14 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using AdventOfCode.Day1;
-using AdventOfCode.Day2;
-using AdventOfCode.Day3;
-using AdventOfCode.Day4;
-using AdventOfCode.Day5;
-using AdventOfCode.Day6;
-using AdventOfCode.Day7;
-using AdventOfCode.Day8;
-using AdventOfCode.Day9;
+﻿using System;
 
 Console.WriteLine("Advent of Code 2022!" + Environment.NewLine);
 
@@ -42,17 +32,22 @@ Console.WriteLine("Advent of Code 2022!" + Environment.NewLine);
 // day6.Part1();
 // day6.Part2();
 
-// Console.WriteLine("");
+// Console.WriteLine("--- Day 7: No Space Left On Device ---");
 // var day7 = new Day7();
 // day7.Part1();
 // day7.Part2();
 
-// Console.WriteLine("");
+// Console.WriteLine("--- Day 8: Treetop Tree House ---");
 // var day8 = new Day8();
 // day8.Part1();
 // day8.Part2();
 
-Console.WriteLine("");
-var day9 = new Day9();
-day9.Part1();
-day9.Part2();
+// Console.WriteLine("--- Day 9: Rope Bridge ---");
+// var day9 = new Day9();
+// day9.Part1();
+// day9.Part2();
+
+// Console.WriteLine("--- Day 10: Cathode-Ray Tube ---");
+// var day10 = new Day10();
+// day10.Part1();
+// day10.Part2();
