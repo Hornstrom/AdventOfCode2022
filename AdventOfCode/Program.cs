@@ -51,3 +51,13 @@ Console.WriteLine("Advent of Code 2022!" + Environment.NewLine);
 // var day10 = new Day10();
 // day10.Part1();
 // day10.Part2();
+
+// Console.WriteLine("-- Day 11: Monkey in the Middle ---");
+// var day11 = new Day11();
+// day11.Part1();
+// day11.Part2();
+
+Console.WriteLine("--- Day 12: Hill Climbing Algorithm ---");
+var day12 = new Day12();
+day12.Part1();
+day12.Part2();
