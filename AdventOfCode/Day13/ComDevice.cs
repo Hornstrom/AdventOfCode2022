@@ -6,10 +6,13 @@ public class ComDevice
     private List<PacketPair> PacketPairs { get; set; }
     public ComDevice(string[] data)
     {
+        PacketPairs = new List<PacketPair>();
         for (int i = 0; i < data.Length - 1; i += 3)
         {
             PacketPairs.Add(new PacketPair(data[i], data[i + 1]));
         }
+        
+        Console.WriteLine("Done parsing input");
     }
 
     public class PacketPair
@@ -22,6 +25,8 @@ public class ComDevice
             LeftPacket = new Packet(leftPacket);
             RightPacket = new Packet(rightPacket);
         }
+        
+        public int SumOfCorrectPairs
     }
 
     public class Packet
@@ -31,12 +36,7 @@ public class ComDevice
         public Packet(string data)
         {
             Packets = new List<Packet>();
-            
-            if (string.IsNullOrEmpty(data))
-            {
-                throw new Exception("No data what gives.");
-            }
-            
+
             if(int.TryParse(data, out var d))
             {
                 Actual = d;
@@ -51,8 +51,27 @@ public class ComDevice
                     }
                     if (data[0] == '[')
                     {
-                        var endOfList = data.LastIndexOf(']');
-                        Packets.Add(new Packet(data[1..(endOfList - 1)]));
+                        var nrOfClosingToSkip = 0;
+                        var endOfList = 0;
+                        for (int i = 1; i < data.Length; i++)
+                        {
+                            if (data[i] == '[')
+                            {
+                                nrOfClosingToSkip++;
+                            }
+                            
+                            if (data[i] == ']' && nrOfClosingToSkip == 0)
+                            {
+                                endOfList = i;
+                            }
+                            
+                            if (data[i] == ']' && nrOfClosingToSkip > 0)
+                            {
+                                nrOfClosingToSkip--;
+                            }
+                        }
+                        
+                        Packets.Add(new Packet(data[1..endOfList]));
                         if (endOfList == data.Length - 1)
                         {
                             data = "";
@@ -67,32 +86,26 @@ public class ComDevice
                     if (char.IsNumber(data[0]))
                     {
                         var indexOfNextComma = data.IndexOf(',');
-                        Packets.Add(new Packet(data[1..(indexOfNextComma - 1)]));
-                        data = data[(indexOfNextComma + 1)..];
-                        
+                        if (indexOfNextComma > 0)
+                        {
+                            Packets.Add(new Packet(data[0..indexOfNextComma]));
+                            data = data[(indexOfNextComma + 1)..];    
+                        }
+                        else
+                        {
+                            data = "";
+                            continue;
+                        }
+                    }
+                    if (data[0] == ',')
+                    {
+                        data = data[1..];
                     }
                 }    
             }
         }
-
-        public string Print()
-        {
-            var result = "";
-
-            if (Actual.HasValue)
-            {
-                result = Actual.ToString();
-            }
-            else
-            {
-                foreach (var packet in Packets)
-                {
-                    result += $"|{packet.Print()}|";
-                }
-            }
-                
-            return result;
-        }
+        
+        
     }
 
     
