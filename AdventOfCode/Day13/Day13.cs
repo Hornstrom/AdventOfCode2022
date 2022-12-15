@@ -10,11 +10,15 @@ public class Day13 : Day
     public void Part1()
     {
         var comDeviceTest = new ComDevice(DataTest);
-        Console.WriteLine();
+        Console.WriteLine($"Sum of indicies test: {comDeviceTest.SumOfCorrectPairs()}");
+        
+        var comDevice = new ComDevice(Data);
+        Console.WriteLine($"Sum of indicies: {comDevice.SumOfCorrectPairs()}");
     }
 
     public void Part2()
     {
+        
         
     }
 }
