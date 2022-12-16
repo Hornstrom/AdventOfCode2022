@@ -47,8 +47,8 @@ public class ComDevice
 
         public PacketPair(string leftPacket, string rightPacket)
         {
-            LeftPacket = new Packet(leftPacket[1..^1], true);
-            RightPacket = new Packet(rightPacket[1..^1], true);
+            LeftPacket = new Packet(leftPacket, true);
+            RightPacket = new Packet(rightPacket, true);
         }
 
         public void Print()
@@ -64,18 +64,21 @@ public class ComDevice
             return HasCorrectOrder(LeftPacket, RightPacket).Value;
         }
 
-        public bool? HasCorrectOrder(Packet left, Packet right)
+        public static bool? HasCorrectOrder(Packet left, Packet right)
         {
+            Console.WriteLine($"Compare {left.Print()} vs {right.Print()}");
             // win by size
             if (left.Actual.HasValue && right.Actual.HasValue)
             {
                 if (left.Actual.Value < right.Actual.Value)
                 {
+                    Console.WriteLine("Left side is smaller, so inputs are in the right order");
                     return true;
                 }
                 
                 if (left.Actual.Value > right.Actual.Value)
                 {
+                    Console.WriteLine("Right side is smaller, so inputs are not in the right order");
                     return false;
                 }
 
@@ -86,18 +89,21 @@ public class ComDevice
             // left side has run out of items
             if (!left.Actual.HasValue && !left.Packets.Any() && (right.Actual.HasValue || right.Packets.Any()))
             {
+                Console.WriteLine("Left side ran out of items, so inputs are in the right order");
                 return true;
             }
             
             // right side has run out of items
             if (!right.Actual.HasValue && !right.Packets.Any() && (left.Actual.HasValue || left.Packets.Any()))
             {
+                Console.WriteLine("Right side ran out of items, so inputs are not in the right order");
                 return false;
             }
             
             // if left is int and right is list
             if (left.Actual.HasValue && !right.Actual.HasValue)
             {
+                Console.WriteLine($"Mixed types; convert left to [{left.Actual.Value}] and retry comparison");
                 var packetToCompare = right.Packets.First();
                 right.Packets.Remove(packetToCompare);
                 return HasCorrectOrder(left, packetToCompare);
@@ -106,6 +112,7 @@ public class ComDevice
             // if right is int and left is list
             if (right.Actual.HasValue && !left.Actual.HasValue)
             {
+                Console.WriteLine($"Mixed types; convert right to [{right.Actual.Value}] and retry comparison");
                 var packetToCompare = left.Packets.First();
                 left.Packets.Remove(packetToCompare);
                 return HasCorrectOrder(packetToCompare, right);
@@ -116,15 +123,24 @@ public class ComDevice
                 // Well let's grab the first package of each then until they run out
                 var firstLeft = left.Packets.FirstOrDefault();
                 var firstRight = right.Packets.FirstOrDefault();
-                if (firstLeft == null)
+                if (firstLeft == null && firstRight != null)
                 {
+                    Console.WriteLine("Left side ran out of items, so inputs are in the right order (loop)");
                     return true;
                 }
 
-                if (firstRight == null)
+                if (firstRight == null && firstLeft != null) 
                 {
+                    Console.WriteLine("Right side ran out of items, so inputs are not in the right order (loop)");
                     return false;
                 }
+
+                if (firstLeft == null && firstRight == null)
+                {
+                    // inconclusive
+                    return null;
+                }
+                
                 left.Packets.Remove(firstLeft);
                 right.Packets.Remove(firstRight);
                 var result = HasCorrectOrder(firstLeft, firstRight);
@@ -134,8 +150,6 @@ public class ComDevice
                 }
             }
         }
-
-        
     }
 
     public class Packet
@@ -156,6 +170,11 @@ public class ComDevice
             {
                 Actual = d;
                 return;
+            }
+            else
+            {
+                // unpack list
+                data = data[1..^1];
             }
 
             var packetStrings = new List<string>();
@@ -179,7 +198,7 @@ public class ComDevice
                         
                         if (data[i] == ']' && nrOfClosingToSkip == 0)
                         {
-                            endOfList = i;
+                            endOfList = i + 1;
                             break;
                         }
                         
@@ -189,10 +208,8 @@ public class ComDevice
                         }
                     }
                     
-                    if (!string.IsNullOrEmpty(data[1..endOfList]))
-                    {
-                        Packets.Add(new Packet(data[1..endOfList], true));
-                    }
+                    packetStrings.Add(data[0..endOfList]);
+
                     if (endOfList == data.Length - 1)
                     {
                         data = "";
@@ -200,7 +217,7 @@ public class ComDevice
                     }
                     else
                     {
-                        data = data[(endOfList + 1)..];
+                        data = data[endOfList..];
                         continue;
                     }
                 }
@@ -210,10 +227,7 @@ public class ComDevice
                     var indexOfNextComma = data.IndexOf(',');
                     if (indexOfNextComma > 0)
                     {
-                        if (!string.IsNullOrEmpty(data[..indexOfNextComma]))
-                        {
-                            Packets.Add(new Packet(data[..indexOfNextComma]));
-                        }
+                        packetStrings.Add(data[..indexOfNextComma]);
                         data = data[(indexOfNextComma + 1)..];    
                         continue;
                     }
@@ -223,10 +237,8 @@ public class ComDevice
                         {
                             throw new Exception("Expected it to only be numbers left in data string");
                         }
-                        if (!string.IsNullOrEmpty(data))
-                        {
-                            Packets.Add(new Packet(data));
-                        }
+                        packetStrings.Add(data);
+
                         data = "";
                         continue;
                     }
@@ -235,8 +247,12 @@ public class ComDevice
                 {
                     data = data[1..];
                 }
-            }    
-        }
+            }
+
+            foreach (var packetString in packetStrings)
+            {
+                Packets.Add(new Packet(packetString));
+            }
         }
 
         public string Print()
@@ -263,6 +279,4 @@ public class ComDevice
 
         }
     }
-
-    
 }
