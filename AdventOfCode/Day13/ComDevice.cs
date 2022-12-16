@@ -14,6 +14,14 @@ public class ComDevice
         
         Console.WriteLine("Done parsing input");
     }
+
+    public void Print()
+    {
+        foreach (var packetPair in PacketPairs)
+        {
+            packetPair.Print();
+        }
+    }
     
     public int SumOfCorrectPairs()
     {
@@ -39,8 +47,16 @@ public class ComDevice
 
         public PacketPair(string leftPacket, string rightPacket)
         {
-            LeftPacket = new Packet(leftPacket);
-            RightPacket = new Packet(rightPacket);
+            LeftPacket = new Packet(leftPacket[1..^1], true);
+            RightPacket = new Packet(rightPacket[1..^1], true);
+        }
+
+        public void Print()
+        {
+            Console.WriteLine(LeftPacket.Print());
+            Console.WriteLine(RightPacket.Print());
+            Console.WriteLine();
+            
         }
 
         public bool HasCorrectOrder()
@@ -126,18 +142,26 @@ public class ComDevice
     {
         public List<Packet> Packets { get; set; }
         public int? Actual { get; set; }
-        public Packet(string data)
+        public Packet(string data, bool isInList = false)
         {
             Packets = new List<Packet>();
 
             if (string.IsNullOrEmpty(data))
             {
+                return;
                 throw new Exception("WHy no data?");
             }
 
             if(int.TryParse(data, out var d))
             {
-                Actual = d;
+                if (isInList)
+                {
+                    Packets.Add(new Packet(d.ToString()));
+                }
+                else
+                {
+                    Actual = d;
+                }
             }
             else
             {
@@ -161,6 +185,7 @@ public class ComDevice
                             if (data[i] == ']' && nrOfClosingToSkip == 0)
                             {
                                 endOfList = i;
+                                break;
                             }
                             
                             if (data[i] == ']' && nrOfClosingToSkip > 0)
@@ -171,7 +196,7 @@ public class ComDevice
                         
                         if (!string.IsNullOrEmpty(data[1..endOfList]))
                         {
-                            Packets.Add(new Packet(data[1..endOfList]));
+                            Packets.Add(new Packet(data[1..endOfList], true));
                         }
                         if (endOfList == data.Length - 1)
                         {
@@ -181,6 +206,7 @@ public class ComDevice
                         else
                         {
                             data = data[(endOfList + 1)..];
+                            continue;
                         }
                     }
 
@@ -194,9 +220,14 @@ public class ComDevice
                                 Packets.Add(new Packet(data[..indexOfNextComma]));
                             }
                             data = data[(indexOfNextComma + 1)..];    
+                            continue;
                         }
                         else
                         {
+                            if (!int.TryParse(data, out var foo))
+                            {
+                                throw new Exception("Expected it to only be numbers left in data string");
+                            }
                             if (!string.IsNullOrEmpty(data))
                             {
                                 Packets.Add(new Packet(data));
@@ -204,7 +235,7 @@ public class ComDevice
                             data = "";
                             continue;
                         }
-                    }
+                    }   
                     if (data[0] == ',')
                     {
                         data = data[1..];
@@ -212,8 +243,30 @@ public class ComDevice
                 }    
             }
         }
-        
-        
+
+        public string Print()
+        {
+            if (Actual.HasValue)
+            {
+                return Actual.ToString();
+            }
+            else
+            {
+                var listOfPackets = "";
+                foreach (var packet in Packets)
+                {
+                    if (!string.IsNullOrEmpty(listOfPackets))
+                    {
+                        listOfPackets += ",";
+                    }
+                    listOfPackets += packet.Print();
+
+                }
+
+                return $"[{listOfPackets}]";
+            }
+
+        }
     }
 
     
