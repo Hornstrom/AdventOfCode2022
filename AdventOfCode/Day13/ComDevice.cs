@@ -154,94 +154,89 @@ public class ComDevice
 
             if(int.TryParse(data, out var d))
             {
-                if (isInList)
-                {
-                    Packets.Add(new Packet(d.ToString()));
-                }
-                else
-                {
-                    Actual = d;
-                }
+                Actual = d;
+                return;
             }
-            else
+
+            var packetStrings = new List<string>();
+            
+            while (!string.IsNullOrEmpty(data))
             {
-                while (!string.IsNullOrEmpty(data))
+                if (data[0] == ']')
                 {
-                    if (data[0] == ']')
+                    throw new Exception("Unexpected char");
+                }
+                if (data[0] == '[')
+                {
+                    var nrOfClosingToSkip = 0;
+                    var endOfList = 0;
+                    for (int i = 1; i < data.Length; i++)
                     {
-                        throw new Exception("Unexpected char");
-                    }
-                    if (data[0] == '[')
-                    {
-                        var nrOfClosingToSkip = 0;
-                        var endOfList = 0;
-                        for (int i = 1; i < data.Length; i++)
+                        if (data[i] == '[')
                         {
-                            if (data[i] == '[')
-                            {
-                                nrOfClosingToSkip++;
-                            }
-                            
-                            if (data[i] == ']' && nrOfClosingToSkip == 0)
-                            {
-                                endOfList = i;
-                                break;
-                            }
-                            
-                            if (data[i] == ']' && nrOfClosingToSkip > 0)
-                            {
-                                nrOfClosingToSkip--;
-                            }
+                            nrOfClosingToSkip++;
                         }
                         
-                        if (!string.IsNullOrEmpty(data[1..endOfList]))
+                        if (data[i] == ']' && nrOfClosingToSkip == 0)
                         {
-                            Packets.Add(new Packet(data[1..endOfList], true));
+                            endOfList = i;
+                            break;
                         }
-                        if (endOfList == data.Length - 1)
+                        
+                        if (data[i] == ']' && nrOfClosingToSkip > 0)
                         {
-                            data = "";
-                            continue;
-                        }
-                        else
-                        {
-                            data = data[(endOfList + 1)..];
-                            continue;
+                            nrOfClosingToSkip--;
                         }
                     }
+                    
+                    if (!string.IsNullOrEmpty(data[1..endOfList]))
+                    {
+                        Packets.Add(new Packet(data[1..endOfList], true));
+                    }
+                    if (endOfList == data.Length - 1)
+                    {
+                        data = "";
+                        continue;
+                    }
+                    else
+                    {
+                        data = data[(endOfList + 1)..];
+                        continue;
+                    }
+                }
 
-                    if (char.IsNumber(data[0]))
+                if (char.IsNumber(data[0]))
+                {
+                    var indexOfNextComma = data.IndexOf(',');
+                    if (indexOfNextComma > 0)
                     {
-                        var indexOfNextComma = data.IndexOf(',');
-                        if (indexOfNextComma > 0)
+                        if (!string.IsNullOrEmpty(data[..indexOfNextComma]))
                         {
-                            if (!string.IsNullOrEmpty(data[..indexOfNextComma]))
-                            {
-                                Packets.Add(new Packet(data[..indexOfNextComma]));
-                            }
-                            data = data[(indexOfNextComma + 1)..];    
-                            continue;
+                            Packets.Add(new Packet(data[..indexOfNextComma]));
                         }
-                        else
-                        {
-                            if (!int.TryParse(data, out var foo))
-                            {
-                                throw new Exception("Expected it to only be numbers left in data string");
-                            }
-                            if (!string.IsNullOrEmpty(data))
-                            {
-                                Packets.Add(new Packet(data));
-                            }
-                            data = "";
-                            continue;
-                        }
-                    }   
-                    if (data[0] == ',')
-                    {
-                        data = data[1..];
+                        data = data[(indexOfNextComma + 1)..];    
+                        continue;
                     }
-                }    
-            }
+                    else
+                    {
+                        if (!int.TryParse(data, out var foo))
+                        {
+                            throw new Exception("Expected it to only be numbers left in data string");
+                        }
+                        if (!string.IsNullOrEmpty(data))
+                        {
+                            Packets.Add(new Packet(data));
+                        }
+                        data = "";
+                        continue;
+                    }
+                }   
+                if (data[0] == ',')
+                {
+                    data = data[1..];
+                }
+            }    
+        }
         }
 
         public string Print()
