@@ -25,6 +25,5 @@ public class Day13 : Day
         
         var comDevice = new ComDevice2(Data);
         Console.WriteLine($"Decoder key: {comDevice.GetDecoderKey()}");
-
     }
 }

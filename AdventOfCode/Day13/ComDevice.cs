@@ -81,7 +81,7 @@ public class ComDevice
                     Console.WriteLine("Right side is smaller, so inputs are not in the right order");
                     return false;
                 }
-
+    
                 return null;
             }
             
@@ -105,7 +105,7 @@ public class ComDevice
             {
                 Console.WriteLine($"Mixed types; convert left to [{left.Actual.Value}] and retry comparison");
                 var packetToCompare = right.Packets.First();
-                right.Packets.Remove(packetToCompare);
+                // right.Packets.Remove(packetToCompare);
                 return HasCorrectOrder(left, packetToCompare);
             }
             
@@ -114,41 +114,48 @@ public class ComDevice
             {
                 Console.WriteLine($"Mixed types; convert right to [{right.Actual.Value}] and retry comparison");
                 var packetToCompare = left.Packets.First();
-                left.Packets.Remove(packetToCompare);
+                // left.Packets.Remove(packetToCompare);
                 return HasCorrectOrder(packetToCompare, right);
             }
             
+            var i = 0;
             while (true)
             {
                 // Well let's grab the first package of each then until they run out
-                var firstLeft = left.Packets.FirstOrDefault();
-                var firstRight = right.Packets.FirstOrDefault();
-                if (firstLeft == null && firstRight != null)
+                var currentLeft = left.Packets.ElementAtOrDefault(i);
+                var currentRight = right.Packets.ElementAtOrDefault(i);
+                if (currentLeft == null && currentRight != null)
                 {
                     Console.WriteLine("Left side ran out of items, so inputs are in the right order (loop)");
                     return true;
                 }
-
-                if (firstRight == null && firstLeft != null) 
+    
+                if (currentRight == null && currentLeft != null) 
                 {
                     Console.WriteLine("Right side ran out of items, so inputs are not in the right order (loop)");
                     return false;
                 }
-
-                if (firstLeft == null && firstRight == null)
+    
+                if (currentLeft == null && currentRight == null)
                 {
                     // inconclusive
                     return null;
                 }
                 
-                left.Packets.Remove(firstLeft);
-                right.Packets.Remove(firstRight);
-                var result = HasCorrectOrder(firstLeft, firstRight);
+                var result = HasCorrectOrder(currentLeft, currentRight);
                 if (result.HasValue)
                 {
                     return result;
                 }
+    
+                i++;
+                if (i > left.Packets.Count + right.Packets.Count)
+                {
+                    break;
+                }
             }
+
+            throw new Exception("Failed to find correct order");
         }
     }
 
