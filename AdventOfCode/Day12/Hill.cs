@@ -70,11 +70,12 @@ namespace AdventOfCode.Day12
                 if (_moves.Count == 0)
                 {
                     Console.WriteLine("Failed to find end");
+                    Print();
                     return;
                 }
                 else
                 {
-                    var nextMove = _moves.MinBy(m => m.DistanceToEnd);
+                    var nextMove = _moves.MinBy(m => Math.Sqrt(Math.Pow(m.DistanceToEnd, 2) + Math.Pow(m.StepsToHere ?? 0, 2)));
                     _moves.Remove(nextMove);
                     Climb(nextMove);    
                 }
@@ -109,19 +110,20 @@ namespace AdventOfCode.Day12
             }
         }
 
-        public void Climb(Node move)
+        public void Climb(Node currentNode)
         {
-            _currentX = move.X;
-            _currentY = move.Y;
+            _currentX = currentNode.X;
+            _currentY = currentNode.Y;
+            // currentNode.Y = move.Y;
 
-            if (_loopCount % 100 == 0)
-            {
-                Print();
-                Console.WriteLine();    
-            }
-            _loopCount++;
+            // if (_loopCount % 100 == 0)
+            // {
+            //     Print();
+            //     Console.WriteLine();    
+            // }
+            // _loopCount++;
             
-            var currentNode = _map[_currentX, _currentY];
+            // var currentNode = _map[currentNode.X, currentNode.Y];
             
             // Check for end condition
             if (currentNode.IsEnd)
@@ -132,13 +134,14 @@ namespace AdventOfCode.Day12
             }
             
             // Evaluate all directions
-            if (_currentX - 1 < 0 || Math.Abs(currentNode.Elevation - _map[_currentX - 1, _currentY].Elevation) > 1)
+            if (currentNode.Y - 1 >= 0 && Math.Abs(currentNode.Elevation - _map[currentNode.X, currentNode.Y - 1].Elevation) <= 1)
             {
-                // north = Int32.MaxValue;
-            }
-            else
-            {
-                var northNode = _map[_currentX - 1, _currentY];
+                var northNode = _map[currentNode.X, currentNode.Y - 1];
+                if (northNode.IsEnd)
+                {
+                    Console.WriteLine($"End is steps{currentNode.StepsToHere + 1}");
+                    _moves.Clear();
+                }
                 if (northNode.StepsToHere == null)
                 {
                     northNode.PreviousNodeX = currentNode.X;
@@ -148,13 +151,14 @@ namespace AdventOfCode.Day12
                 }
             }
             
-            if (_currentX + 1 > _width - 1 || Math.Abs(currentNode.Elevation - _map[_currentX + 1, _currentY].Elevation) > 1)
+            if (currentNode.Y + 1 <= _height - 1 && Math.Abs(currentNode.Elevation - _map[currentNode.X, currentNode.Y + 1].Elevation) <= 1)
             {
-                // south = Int32.MaxValue;
-            }
-            else
-            {
-                var southNode = _map[_currentX + 1, _currentY];
+                var southNode = _map[currentNode.X, currentNode.Y + 1];
+                if (southNode.IsEnd)
+                {
+                    Console.WriteLine($"End is steps{currentNode.StepsToHere + 1}");
+                    _moves.Clear();
+                }
                 if (southNode.StepsToHere == null)
                 {
                     southNode.PreviousNodeX = currentNode.X;
@@ -165,14 +169,14 @@ namespace AdventOfCode.Day12
                 
             }
             
-            if (_currentY + 1 > _height - 1 || Math.Abs(currentNode.Elevation - _map[_currentX, _currentY + 1].Elevation) > 1)
+            if (currentNode.X + 1 <= _width - 1 && Math.Abs(currentNode.Elevation - _map[currentNode.X + 1, currentNode.Y].Elevation) <= 1)
             {
-                // east = Int32.MaxValue;
-            }
-            else
-            {
-                var eastNode = _map[_currentX, _currentY + 1];
-
+                var eastNode = _map[currentNode.X + 1, currentNode.Y];
+                if (eastNode.IsEnd)
+                {
+                    Console.WriteLine($"End is steps{currentNode.StepsToHere + 1}");
+                    _moves.Clear();
+                }
                 if (eastNode.StepsToHere == null)
                 {
                     eastNode.PreviousNodeX = currentNode.X;
@@ -183,13 +187,14 @@ namespace AdventOfCode.Day12
                 
             }
             
-            if (_currentY - 1 < 0 || Math.Abs(currentNode.Elevation - _map[_currentX, _currentY - 1].Elevation) > 1)
+            if (currentNode.X - 1 >= 0 && Math.Abs(currentNode.Elevation - _map[currentNode.X - 1, currentNode.Y].Elevation) <= 1)
             {
-                //west = Int32.MaxValue;
-            }
-            else
-            {
-                var westNode = _map[_currentX, _currentY - 1];
+                var westNode = _map[currentNode.X - 1, currentNode.Y];
+                if (westNode.IsEnd)
+                {
+                    Console.WriteLine($"End is steps{currentNode.StepsToHere + 1}");
+                    _moves.Clear();
+                }
                 if (westNode.StepsToHere == null)
                 {
                     westNode.PreviousNodeX = currentNode.X;
@@ -206,7 +211,7 @@ namespace AdventOfCode.Day12
     {
         public int X { get; set; }
         public int Y { get; set; }
-        public int DistanceToEnd { get; set; }
+        public double DistanceToEnd { get; set; }
         public int? StepsToHere { get; set; }
         public int? PreviousNodeX { get; set; }
         public int? PreviousNodeY { get; set; }
