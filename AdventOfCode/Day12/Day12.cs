@@ -9,15 +9,19 @@ public class Day12 : Day
     
     public void Part1()
     {
-        var hillTest = new Hill(DataTest);
-        hillTest.RunClimb();
-        // hill.Print();
-        var hill = new Hill(Data);
-        hill.RunClimb();
+        // var hillTest = new Hill(DataTest);
+        // hillTest.RunClimb();
+        //
+        // var hill = new Hill(Data);
+        // hill.RunClimb();
     }
 
     public void Part2()
     {
+        var hillTest = new Hill(DataTest);
+        hillTest.FewestStepsFromLowestElevation();
         
+        var hill = new Hill(Data);
+        Console.WriteLine($"Shortest path form elevation a to end is: {hill.FewestStepsFromLowestElevation()}");
     }
 }
