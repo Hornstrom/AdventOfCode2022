@@ -57,12 +57,12 @@ Console.WriteLine("Advent of Code 2022!" + Environment.NewLine);
 // day11.Part1();
 // day11.Part2();
 
-// Console.WriteLine("--- Day 12: Hill Climbing Algorithm ---");
-// var day12 = new Day12();
-// day12.Part1();
-// day12.Part2();
+Console.WriteLine("--- Day 12: Hill Climbing Algorithm ---");
+var day12 = new Day12();
+day12.Part1();
+day12.Part2();
 
-Console.WriteLine("--- Day 13: Distress Signal ---");
-var day13 = new Day13();
-day13.Part1();
-day13.Part2();
+// Console.WriteLine("--- Day 13: Distress Signal ---");
+// var day13 = new Day13();
+// day13.Part1();
+// day13.Part2();

@@ -1,5 +1,7 @@
 ﻿
 
+using AdventOfCode.Day12;
+
 public class Day12 : Day
 {
     public string[] Data = System.IO.File.ReadAllLines(@"Day12\data.txt");
@@ -7,7 +9,11 @@ public class Day12 : Day
     
     public void Part1()
     {
-        
+        var hillTest = new Hill(DataTest);
+        hillTest.RunClimb();
+        // hill.Print();
+        var hill = new Hill(Data);
+        hill.RunClimb();
     }
 
     public void Part2()
