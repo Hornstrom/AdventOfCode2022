@@ -2,7 +2,7 @@
 
 public class CalorieCounter
 {
-    public string[] BackPackData = System.IO.File.ReadAllLines(@"Day1\data.txt");
+    gi
     public string[] BackPackDataTest = System.IO.File.ReadAllLines(@"Day1\test_data.txt");
 
     public void WhoCarriesTheMost()
